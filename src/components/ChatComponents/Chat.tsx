@@ -1,3 +1,4 @@
+import { Flex, Spinner } from "@chakra-ui/react";
 import React, { useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { AuthContext } from "../../contexts/AuthContext";
@@ -32,8 +33,9 @@ function useSocket(url: string) {
 }
 
 const Chat = ({ id_room }: PropChat) => {
-  const socket = useSocket('http://localhost:3333');
+  const socket = useSocket('http://192.168.0.7:3333');
   const { user, logout } = useContext(AuthContext);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
     if(socket){
@@ -41,11 +43,10 @@ const Chat = ({ id_room }: PropChat) => {
         id_user: user.id,
         id_room
     }, messages => {
-        console.log(messages);
         setMessages(messages);
+        setLoading(false);
     });
     }
-      
   });
 
 
@@ -78,7 +79,14 @@ const Chat = ({ id_room }: PropChat) => {
     <>
         <Header />
         <Divider />
-        <Messages messages={messages} />
+        {loading ? (
+          <Flex justify={"center"} w="100%">
+            <Spinner size="md" color="gray.500" ml="4" />
+          </Flex>
+        ) : (
+            <Messages messages={messages} />
+        )}
+        
         <Divider />
         <Footer
           inputMessage={inputMessage}
